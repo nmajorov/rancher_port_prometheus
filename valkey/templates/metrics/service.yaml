@@ -1,0 +1,26 @@
+{{- if (eq (include "templateToBoolean" (dict "template" (and .Values.metrics.enabled .Values.metrics.service.enabled) "context" $)) "true") }}
+apiVersion: v1
+kind: Service
+metadata:
+  {{- include "renderAnnotations" (dict "additionalAnnotations" .Values.metrics.service.annotations "context" $) | indent 2 }}
+  {{- include "renderLabels" (dict "component" "metrics" "context" $) | indent 2 }}
+  name: {{ include "fullName" (dict "suffix" "metrics" "context" $) }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  {{- include "renderValues" (dict "omitKeys" (list "enabled" "annotations" "nodePorts" "ports" "selector") "values" .Values.metrics.service) | indent 2 }}
+  ports: {{- range $key, $value := .Values.metrics.service.ports }}
+    {{- if and $key (coalesce $value (get $.Values.containerPorts $key)) }}
+    - name: {{ $key }}
+      {{- if has $.Values.metrics.service.type (list "LoadBalancer" "NodePort") }}
+      {{- if not (empty (get $.Values.metrics.service.nodePorts $key)) }}
+      nodePort: {{ get $.Values.metrics.service.nodePorts $key }}
+      {{- end }}
+      {{- end }}
+      port: {{ coalesce $value (get $.Values.containerPorts $key) }}
+      {{- if get $.Values.containerPorts $key }}
+      targetPort: {{ $key }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  selector: {{- include "matchLabels" (dict "additionalLabels" .Values.podTemplates.labels "component" "valkey" "context" $) | nindent 4 }}
+{{- end }}

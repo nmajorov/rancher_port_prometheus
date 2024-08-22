@@ -1,0 +1,19 @@
+annotations:
+  helm.sh/images: |
+    - image: dp.apps.rancher.io/containers/valkey:7.2.5
+      name: valkey
+    - image: dp.apps.rancher.io/containers/redis-exporter:1
+      name: redis-exporter
+    - image: dp.apps.rancher.io/containers/bci-busybox:15.5
+      name: bci-busybox
+apiVersion: v2
+appVersion: 7.2.5
+description: Valkey is a high-performance data structure server that primarily serves
+  key/value workloads. It supports a wide range of native structures and an extensible
+  plugin system for adding new data structures and access patterns.
+home: https://apps.rancher.io/applications/valkey
+maintainers:
+- name: SUSE LLC
+  url: https://www.suse.com/
+name: valkey
+version: 0.3.2

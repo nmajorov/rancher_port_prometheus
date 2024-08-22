@@ -1,0 +1,20 @@
+{{- $scripts := dict }}
+{{- if eq .Values.architecture "cluster" }}
+{{- $scripts = .Files.Glob "scripts/{*,cluster/*,valkey/*}.sh" }}
+{{- else }}
+{{- $scripts = .Files.Glob "scripts/{*,valkey/*}.sh" }}
+{{- end }}
+{{- if $scripts }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- include "renderAnnotations" . | indent 2 }}
+  {{- include "renderLabels" (dict "component" "main" "context" $) | indent 2 }}
+  name: {{ include "fullName" (dict "suffix" "scripts" "context" $) }}
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  {{- range $path, $contents := $scripts }}
+  {{ base $path }}: |
+    {{- printf "%s" $contents | nindent 4 }}
+  {{- end }}
+{{- end }}
