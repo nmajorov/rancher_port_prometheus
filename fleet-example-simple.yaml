@@ -1,0 +1,17 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  annotations:
+    field.cattle.io/description: fleet-simple-app
+  name: simple
+  namespace: fleet-default
+spec:
+  branch: master
+  correctDrift:
+    enabled: false
+  insecureSkipTLSVerify: false
+  paths:
+    - /simple
+  targetNamespace: fleet-local
+  targets:
+    - clusterName: nm-demo-nv
